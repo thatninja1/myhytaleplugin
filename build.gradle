@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'com.ninja.tags'
+version = '1.0.0'
+
+def targetJavaVersion = 25
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compileOnly name: 'HytaleServer'
+    compileOnly 'net.luckperms:api:5.4'
+
+    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'org.yaml:snakeyaml:2.2'
+}
+
+shadowJar {
+    archiveClassifier.set('')
+    relocate 'org.sqlite', 'com.ninja.tags.shaded.org.sqlite'
+    relocate 'com.google.gson', 'com.ninja.tags.shaded.gson'
+    relocate 'org.yaml.snakeyaml', 'com.ninja.tags.shaded.snakeyaml'
+}
+
+jar {
+    enabled = false
+}
+
+build {
+    dependsOn shadowJar
+}
+

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "warlord",
+    "display": "&#B30000&l[Warlord]",
+    "description": "&7A feared commander of chaos.",
+    "permission": "tags.warlord"
+  },
+  {
+    "id": "rogue",
+    "display": "&#00B36B&l[Rogue]",
+    "description": "&7Silent and unseen.",
+    "permission": "tags.rogue"
+  }
+]

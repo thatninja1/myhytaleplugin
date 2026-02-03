@@ -1,0 +1,7 @@
+{
+  "Group": "com.ninja.tags",
+  "Name": "NinjaTags",
+  "Version": "1.0.0",
+  "Main": "com.ninja.tags.NinjaTagsPlugin",
+  "IncludesAssetPack": true
+}
