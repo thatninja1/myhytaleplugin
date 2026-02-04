@@ -15,12 +15,11 @@ import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.ninja.tags.config.ConfigManager;
-import com.ninja.tags.db.TagDao;
 import com.ninja.tags.lp.LuckPermsService;
+import com.ninja.tags.store.TagStore;
 import com.ninja.tags.tags.TagDefinition;
 import com.ninja.tags.tags.TagRegistry;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,7 +42,7 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
         .build();
 
     private final TagRegistry tagRegistry;
-    private final TagDao tagDao;
+    private final TagStore tagStore;
     private final ConfigManager configManager;
     private final Optional<LuckPermsService> luckPermsService;
     private String filterText = "";
@@ -51,12 +50,12 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
 
     public NinjaTagsTagsUI(PlayerRef playerRef,
                            TagRegistry tagRegistry,
-                           TagDao tagDao,
+                           TagStore tagStore,
                            ConfigManager configManager,
                            Optional<LuckPermsService> luckPermsService) {
         super(playerRef, CustomPageLifetime.CanDismiss, EVENT_CODEC);
         this.tagRegistry = tagRegistry;
-        this.tagDao = tagDao;
+        this.tagStore = tagStore;
         this.configManager = configManager;
         this.luckPermsService = luckPermsService;
     }
@@ -150,13 +149,7 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
                              UICommandBuilder commands,
                              UIEventBuilder events) {
         UUID playerId = playerRef.getUuid();
-        List<TagDefinition> ownedTags;
-        try {
-            ownedTags = getFilteredOwnedTags(playerId);
-        } catch (SQLException ex) {
-            playerRef.sendMessage(Message.raw("Failed to load tags."));
-            return;
-        }
+        List<TagDefinition> ownedTags = getFilteredOwnedTags(playerId);
 
         int totalPages = Math.max(1, (int) Math.ceil(ownedTags.size() / (double) PAGE_SIZE));
         if (pageIndex >= totalPages) {
@@ -173,12 +166,7 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
             pageTags.addAll(ownedTags.subList(start, end));
         }
 
-        Optional<String> equipped;
-        try {
-            equipped = tagDao.getEquippedTag(playerId);
-        } catch (SQLException ex) {
-            equipped = Optional.empty();
-        }
+        Optional<String> equipped = tagStore.getEquippedTag(playerId);
         String equippedId = equipped.orElse(null);
 
         commands.set("#TitleLabel.text", configManager.getUiTitle());
@@ -194,7 +182,7 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
             if (i < pageTags.size()) {
                 TagDefinition tag = pageTags.get(i);
                 String display = tag.getDisplay() == null ? "" : tag.getDisplay();
-                String plainName = TagsPage.stripColorCodes(display);
+                String plainName = stripColorCodes(display);
                 String color = extractHexColor(display);
                 commands.set(nameId + ".text", plainName);
                 commands.set(nameId + ".color", color);
@@ -215,8 +203,8 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
         }
     }
 
-    private List<TagDefinition> getFilteredOwnedTags(UUID playerId) throws SQLException {
-        Set<String> ownedIds = tagDao.getOwnedTags(playerId);
+    private List<TagDefinition> getFilteredOwnedTags(UUID playerId) {
+        Set<String> ownedIds = tagStore.getOwnedTags(playerId);
         if (ownedIds.isEmpty()) {
             return List.of();
         }
@@ -227,8 +215,12 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
             if (!ownedIds.contains(normalized)) {
                 continue;
             }
-            if (!search.isEmpty() && (tag.getId() == null || !tag.getId().toLowerCase(Locale.ROOT).contains(search))) {
-                continue;
+            if (!search.isEmpty()) {
+                String id = tag.getId() == null ? "" : tag.getId().toLowerCase(Locale.ROOT);
+                String display = stripColorCodes(tag.getDisplay()).toLowerCase(Locale.ROOT);
+                if (!id.contains(search) && !display.contains(search)) {
+                    continue;
+                }
             }
             owned.add(tag);
         }
@@ -244,19 +236,15 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
             return;
         }
         UUID playerId = playerRef.getUuid();
-        try {
-            Optional<String> equipped = tagDao.getEquippedTag(playerId);
-            if (equipped.isPresent() && equipped.get().equalsIgnoreCase(tag.normalizedId())) {
-                deEquip(playerId);
-                return;
-            }
-            equipTag(playerId, tag);
-        } catch (SQLException ex) {
-            playerRef.sendMessage(Message.raw("Failed to update tag selection."));
+        Optional<String> equipped = tagStore.getEquippedTag(playerId);
+        if (equipped.isPresent() && equipped.get().equalsIgnoreCase(tag.normalizedId())) {
+            deEquip(playerId);
+            return;
         }
+        equipTag(playerId, tag);
     }
 
-    private void equipTag(UUID playerId, TagDefinition tag) throws SQLException {
+    private void equipTag(UUID playerId, TagDefinition tag) {
         if (luckPermsService.isEmpty()) {
             return;
         }
@@ -264,10 +252,10 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
         if (!updated) {
             return;
         }
-        tagDao.setEquippedTag(playerId, tag.normalizedId());
+        tagStore.setEquippedTag(playerId, tag.normalizedId());
     }
 
-    private void deEquip(UUID playerId) throws SQLException {
+    private void deEquip(UUID playerId) {
         if (luckPermsService.isEmpty()) {
             return;
         }
@@ -275,7 +263,7 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
         if (!updated) {
             return;
         }
-        tagDao.clearEquippedTag(playerId);
+        tagStore.setEquippedTag(playerId, null);
     }
 
     private static String extractHexColor(String display) {
@@ -297,6 +285,14 @@ public class NinjaTagsTagsUI extends InteractiveCustomUIPage<NinjaTagsTagsUI.UIE
             return second;
         }
         return null;
+    }
+
+    private static String stripColorCodes(String input) {
+        if (input == null) {
+            return "";
+        }
+        String withoutHex = input.replaceAll("&#[0-9A-Fa-f]{6}", "");
+        return withoutHex.replaceAll("&[0-9A-FK-ORa-fk-or]", "");
     }
 
     public static class UIEventData {

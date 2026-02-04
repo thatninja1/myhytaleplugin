@@ -22,7 +22,6 @@ dependencies {
     compileOnly(files("libs/HytaleServer.jar"))
     compileOnly 'net.luckperms:api:5.4'
 
-    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'org.yaml:snakeyaml:2.2'
 }

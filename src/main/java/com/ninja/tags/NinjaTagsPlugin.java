@@ -3,9 +3,10 @@ package com.ninja.tags;
 import com.ninja.tags.commands.TagsAdminCommand;
 import com.ninja.tags.commands.TagsCommand;
 import com.ninja.tags.config.ConfigManager;
-import com.ninja.tags.db.SqliteDb;
-import com.ninja.tags.db.TagDao;
 import com.ninja.tags.lp.LuckPermsService;
+import com.ninja.tags.store.JsonTagStore;
+import com.ninja.tags.store.TagStore;
+import com.ninja.tags.tags.TagDefinition;
 import com.ninja.tags.tags.TagRegistry;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
@@ -19,7 +20,6 @@ import net.luckperms.api.LuckPermsProvider;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.Map;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +30,7 @@ import java.util.logging.Level;
 public class NinjaTagsPlugin extends JavaPlugin {
     private ConfigManager configManager;
     private TagRegistry tagRegistry;
-    private TagDao tagDao;
+    private TagStore tagStore;
     private Optional<LuckPermsService> luckPermsService = Optional.empty();
     private final Map<UUID, Player> onlinePlayers = new ConcurrentHashMap<>();
 
@@ -48,9 +48,8 @@ public class NinjaTagsPlugin extends JavaPlugin {
             tagRegistry = new TagRegistry(dataFolder);
             tagRegistry.load();
 
-            SqliteDb db = new SqliteDb(dataFolder);
-            tagDao = new TagDao(db);
-            tagDao.initialize();
+            tagStore = new JsonTagStore(dataFolder);
+            tagStore.initialize();
 
             luckPermsService = LuckPermsService.from(resolveLuckPerms(),
                 configManager.getSuffixPriority(),
@@ -58,7 +57,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
             registerCommands();
             registerListeners();
-        } catch (IOException | SQLException ex) {
+        } catch (IOException ex) {
             getLogger().at(Level.SEVERE).withCause(ex).log("Failed to initialize NinjaTags");
         }
     }
@@ -72,7 +71,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         onlinePlayers.clear();
     }
 
-    public void reload() throws SQLException {
+    public void reload() {
         try {
             configManager.load();
             tagRegistry.load();
@@ -90,8 +89,8 @@ public class NinjaTagsPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        TagsCommand tagsCommand = new TagsCommand(this, tagDao, tagRegistry, configManager, luckPermsService);
-        TagsAdminCommand adminCommand = new TagsAdminCommand(this, tagDao, tagRegistry, luckPermsService);
+        TagsCommand tagsCommand = new TagsCommand(this, tagStore, tagRegistry, configManager, luckPermsService);
+        TagsAdminCommand adminCommand = new TagsAdminCommand(this, tagStore, tagRegistry, luckPermsService);
 
         List<String> aliases = configManager.getAliases();
         if (!aliases.isEmpty()) {
@@ -108,12 +107,8 @@ public class NinjaTagsPlugin extends JavaPlugin {
     private void registerListeners() {
         getEventRegistry().registerGlobal(PlayerReadyEvent.class, event -> {
             Player player = event.getPlayer();
-            try {
-                touchPlayerRecord(player, tagDao);
-                reconcileEquippedTag(getPlayerUuid(player));
-            } catch (SQLException ex) {
-                getLogger().at(Level.WARNING).withCause(ex).log("Failed to update player record");
-            }
+            touchPlayerRecord(player);
+            reconcileEquippedTag(getPlayerUuid(player), player);
             onlinePlayers.put(getPlayerUuid(player), player);
         });
 
@@ -125,19 +120,27 @@ public class NinjaTagsPlugin extends JavaPlugin {
         });
     }
 
-    private void reconcileEquippedTag(UUID uuid) throws SQLException {
-        Optional<String> equipped = tagDao.getEquippedTag(uuid);
+    private void reconcileEquippedTag(UUID uuid, Player player) {
+        Optional<String> equipped = tagStore.getEquippedTag(uuid);
         if (equipped.isEmpty()) {
             return;
         }
-        if (tagRegistry.getTag(equipped.get()) == null) {
-            tagDao.clearEquippedTag(uuid);
+        String equippedId = equipped.get();
+        if (tagRegistry.getTag(equippedId) == null || !tagStore.getOwnedTags(uuid).contains(equippedId)) {
+            tagStore.setEquippedTag(uuid, null);
             luckPermsService.ifPresent(service -> service.clearSuffixes(uuid));
+            return;
+        }
+        if (player != null && luckPermsService.isPresent()) {
+            TagDefinition tag = tagRegistry.getTag(equippedId);
+            if (tag != null) {
+                luckPermsService.get().setSuffix(uuid, " " + tag.getDisplay());
+            }
         }
     }
 
-    public void touchPlayerRecord(Player player, TagDao tagDao) throws SQLException {
-        tagDao.upsertPlayer(getPlayerUuid(player), player.getDisplayName());
+    public void touchPlayerRecord(Player player) {
+        tagStore.upsertPlayer(getPlayerUuid(player), player.getDisplayName());
     }
 
     public boolean hasPermission(CommandSender sender, String permission) {
@@ -150,6 +153,10 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
     public Player findOnlinePlayer(UUID uuid) {
         return onlinePlayers.get(uuid);
+    }
+
+    public TagStore getTagStore() {
+        return tagStore;
     }
 
     private UUID getPlayerUuid(Player player) {
