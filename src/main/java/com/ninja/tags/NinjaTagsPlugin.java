@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class NinjaTagsPlugin extends JavaPlugin {
     private ConfigManager configManager;
@@ -65,7 +66,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             registerCommands();
             registerListeners();
         } catch (IOException | SQLException ex) {
-            getLogger().error("Failed to initialize NinjaTags", ex);
+            getLogger().at(Level.SEVERE).withCause(ex).log("Failed to initialize NinjaTags");
         }
     }
 
@@ -83,7 +84,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             configManager.load();
             tagRegistry.load();
         } catch (IOException ex) {
-            getLogger().error("Failed to reload NinjaTags", ex);
+            getLogger().at(Level.SEVERE).withCause(ex).log("Failed to reload NinjaTags");
         }
     }
 
@@ -112,15 +113,15 @@ public class NinjaTagsPlugin extends JavaPlugin {
     }
 
     private void registerListeners() {
-        getEventRegistry().register(PlayerReadyEvent.class, event -> {
+        getEventRegistry().registerGlobal(PlayerReadyEvent.class, event -> {
             Player player = event.getPlayer();
             try {
                 touchPlayerRecord(player, tagDao);
-                reconcileEquippedTag(player.getUuid());
+                reconcileEquippedTag(getPlayerUuid(player));
             } catch (SQLException ex) {
-                getLogger().warn("Failed to update player record", ex);
+                getLogger().at(Level.WARNING).withCause(ex).log("Failed to update player record");
             }
-            onlinePlayers.put(player.getUuid(), player);
+            onlinePlayers.put(getPlayerUuid(player), player);
         });
 
         getEventRegistry().register(PlayerDisconnectEvent.class, event -> {
@@ -143,7 +144,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
     }
 
     public void touchPlayerRecord(Player player, TagDao tagDao) throws SQLException {
-        tagDao.upsertPlayer(player.getUuid(), player.getPlayerRef().getUsername());
+        tagDao.upsertPlayer(getPlayerUuid(player), player.getDisplayName());
     }
 
     public boolean hasPermission(CommandSender sender, String permission) {
@@ -156,5 +157,9 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
     public Player findOnlinePlayer(UUID uuid) {
         return onlinePlayers.get(uuid);
+    }
+
+    private UUID getPlayerUuid(Player player) {
+        return ((CommandSender) player).getUuid();
     }
 }
