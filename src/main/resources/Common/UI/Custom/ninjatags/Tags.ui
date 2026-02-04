@@ -1,0 +1,134 @@
+$C = "../Common.ui"
+
+$C.@PageOverlay {
+  @Panel {
+    id = "RootPanel"
+    width = 800
+    height = 600
+    backgroundColor = "#121212"
+
+    @Label {
+      id = "TitleLabel"
+      text = "tags"
+      x = 32
+      y = 24
+      width = 736
+      height = 32
+    }
+
+    @TextBox {
+      id = "TagSearchBox"
+      x = 32
+      y = 72
+      width = 520
+      height = 32
+      placeholder = "Search tags..."
+    }
+    @Button {
+      id = "ApplyFilterButton"
+      text = "APPLY"
+      x = 564
+      y = 72
+      width = 96
+      height = 32
+    }
+    @Button {
+      id = "ClearFilterButton"
+      text = "CLEAR"
+      x = 672
+      y = 72
+      width = 96
+      height = 32
+    }
+
+    @Panel {
+      id = "TagsListPanel"
+      x = 32
+      y = 120
+      width = 736
+      height = 360
+
+      @Label { id = "TagRow0Name" x = 0 y = 0 width = 520 height = 20 }
+      @Label { id = "TagRow0Description" x = 0 y = 20 width = 520 height = 18 }
+      @Button { id = "TagRow0Button" text = "Equip" x = 560 y = 4 width = 160 height = 32 }
+
+      @Label { id = "TagRow1Name" x = 0 y = 36 width = 520 height = 20 }
+      @Label { id = "TagRow1Description" x = 0 y = 56 width = 520 height = 18 }
+      @Button { id = "TagRow1Button" text = "Equip" x = 560 y = 40 width = 160 height = 32 }
+
+      @Label { id = "TagRow2Name" x = 0 y = 72 width = 520 height = 20 }
+      @Label { id = "TagRow2Description" x = 0 y = 92 width = 520 height = 18 }
+      @Button { id = "TagRow2Button" text = "Equip" x = 560 y = 76 width = 160 height = 32 }
+
+      @Label { id = "TagRow3Name" x = 0 y = 108 width = 520 height = 20 }
+      @Label { id = "TagRow3Description" x = 0 y = 128 width = 520 height = 18 }
+      @Button { id = "TagRow3Button" text = "Equip" x = 560 y = 112 width = 160 height = 32 }
+
+      @Label { id = "TagRow4Name" x = 0 y = 144 width = 520 height = 20 }
+      @Label { id = "TagRow4Description" x = 0 y = 164 width = 520 height = 18 }
+      @Button { id = "TagRow4Button" text = "Equip" x = 560 y = 148 width = 160 height = 32 }
+
+      @Label { id = "TagRow5Name" x = 0 y = 180 width = 520 height = 20 }
+      @Label { id = "TagRow5Description" x = 0 y = 200 width = 520 height = 18 }
+      @Button { id = "TagRow5Button" text = "Equip" x = 560 y = 184 width = 160 height = 32 }
+
+      @Label { id = "TagRow6Name" x = 0 y = 216 width = 520 height = 20 }
+      @Label { id = "TagRow6Description" x = 0 y = 236 width = 520 height = 18 }
+      @Button { id = "TagRow6Button" text = "Equip" x = 560 y = 220 width = 160 height = 32 }
+
+      @Label { id = "TagRow7Name" x = 0 y = 252 width = 520 height = 20 }
+      @Label { id = "TagRow7Description" x = 0 y = 272 width = 520 height = 18 }
+      @Button { id = "TagRow7Button" text = "Equip" x = 560 y = 256 width = 160 height = 32 }
+
+      @Label { id = "TagRow8Name" x = 0 y = 288 width = 520 height = 20 }
+      @Label { id = "TagRow8Description" x = 0 y = 308 width = 520 height = 18 }
+      @Button { id = "TagRow8Button" text = "Equip" x = 560 y = 292 width = 160 height = 32 }
+
+      @Label { id = "TagRow9Name" x = 0 y = 324 width = 520 height = 20 }
+      @Label { id = "TagRow9Description" x = 0 y = 344 width = 520 height = 18 }
+      @Button { id = "TagRow9Button" text = "Equip" x = 560 y = 328 width = 160 height = 32 }
+    }
+
+    @Button {
+      id = "PrevPageButton"
+      text = "Prev"
+      x = 32
+      y = 500
+      width = 80
+      height = 32
+    }
+    @Label {
+      id = "PageLabel"
+      text = "Page 1/1"
+      x = 124
+      y = 500
+      width = 200
+      height = 32
+    }
+    @Button {
+      id = "NextPageButton"
+      text = "Next"
+      x = 336
+      y = 500
+      width = 80
+      height = 32
+    }
+
+    @Label {
+      id = "BuyHintLabel"
+      text = "/buy to buy more tags"
+      x = 32
+      y = 540
+      width = 520
+      height = 32
+    }
+    @Button {
+      id = "CloseButton"
+      text = "Close"
+      x = 628
+      y = 536
+      width = 140
+      height = 36
+    }
+  }
+}

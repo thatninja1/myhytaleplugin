@@ -7,8 +7,6 @@ import com.ninja.tags.db.SqliteDb;
 import com.ninja.tags.db.TagDao;
 import com.ninja.tags.lp.LuckPermsService;
 import com.ninja.tags.tags.TagRegistry;
-import com.ninja.tags.ui.TagsPage;
-import com.ninja.tags.ui.TagsUiController;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -34,8 +32,6 @@ public class NinjaTagsPlugin extends JavaPlugin {
     private TagRegistry tagRegistry;
     private TagDao tagDao;
     private Optional<LuckPermsService> luckPermsService = Optional.empty();
-    private TagsPage tagsPage;
-    private TagsUiController uiController;
     private final Map<UUID, Player> onlinePlayers = new ConcurrentHashMap<>();
 
     public NinjaTagsPlugin(JavaPluginInit init) {
@@ -59,9 +55,6 @@ public class NinjaTagsPlugin extends JavaPlugin {
             luckPermsService = LuckPermsService.from(resolveLuckPerms(),
                 configManager.getSuffixPriority(),
                 configManager.getClearSuffixPriorityGte());
-
-            tagsPage = new TagsPage(configManager, tagRegistry, tagDao);
-            uiController = new TagsUiController(tagRegistry, tagDao, tagsPage, configManager, luckPermsService);
 
             registerCommands();
             registerListeners();
@@ -97,7 +90,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        TagsCommand tagsCommand = new TagsCommand(this, tagDao, uiController);
+        TagsCommand tagsCommand = new TagsCommand(this, tagDao, tagRegistry, configManager, luckPermsService);
         TagsAdminCommand adminCommand = new TagsAdminCommand(this, tagDao, tagRegistry, luckPermsService);
 
         List<String> aliases = configManager.getAliases();

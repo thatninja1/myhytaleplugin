@@ -35,9 +35,8 @@ shadowJar {
     mergeServiceFiles()
 }
 
-jar {
-    archiveBaseName.set("ninjatags")
-    archiveClassifier.set('plain')
+tasks.named("jar") {
+    enabled = false
 }
 
 tasks.register("verifyHytaleServerJar") {
