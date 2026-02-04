@@ -1,0 +1,12 @@
+commands:
+  aliases: ["tag"]
+ui:
+  title: "tags"
+  pageSize: 10
+buy:
+  message: "/buy to buy more tags"
+luckperms:
+  suffixPriority: 100
+  clearSuffixPriorityGte: 100
+ownership:
+  usePermissionField: false
