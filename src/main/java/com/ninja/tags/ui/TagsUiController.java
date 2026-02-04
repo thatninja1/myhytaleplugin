@@ -6,7 +6,7 @@ import com.ninja.tags.lp.LuckPermsService;
 import com.ninja.tags.tags.TagDefinition;
 import com.ninja.tags.tags.TagRegistry;
 import com.ninja.tags.ui.TagsPage.TagsPageState;
-import com.hytale.server.player.Player;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

@@ -5,16 +5,19 @@ import com.ninja.tags.db.TagDao;
 import com.ninja.tags.lp.LuckPermsService;
 import com.ninja.tags.tags.TagDefinition;
 import com.ninja.tags.tags.TagRegistry;
-import com.hytale.server.command.CommandSender;
-import com.hytale.server.player.Player;
+import com.hypixel.hytale.server.core.command.system.AbstractCommand;
+import com.hypixel.hytale.server.core.command.system.CommandContext;
+import com.hypixel.hytale.server.core.command.system.CommandSender;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public class TagsAdminCommand {
+public class TagsAdminCommand extends AbstractCommand {
     private final NinjaTagsPlugin plugin;
     private final TagDao tagDao;
     private final TagRegistry tagRegistry;
@@ -24,21 +27,27 @@ public class TagsAdminCommand {
                             TagDao tagDao,
                             TagRegistry tagRegistry,
                             Optional<LuckPermsService> luckPermsService) {
+        super("tagsadmin", "Administer tags");
         this.plugin = plugin;
         this.tagDao = tagDao;
         this.tagRegistry = tagRegistry;
         this.luckPermsService = luckPermsService;
+        requirePermission("tags.admin");
+        setAllowsExtraArguments(true);
     }
 
-    public void execute(CommandSender sender, String[] args) {
+    @Override
+    protected CompletableFuture<Void> execute(CommandContext context) {
+        CommandSender sender = context.sender();
         if (!plugin.hasPermission(sender, "tags.admin")) {
             plugin.sendMessage(sender, "You do not have permission to use this command.");
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
+        String[] args = parseArgs(context);
         if (args.length == 0) {
             plugin.sendMessage(sender, "Usage: /tagsadmin <give|giveall|remove|reload>");
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
         String sub = args[0].toLowerCase();
@@ -53,6 +62,8 @@ public class TagsAdminCommand {
         } catch (SQLException ex) {
             plugin.sendMessage(sender, "Database error while processing command.");
         }
+
+        return CompletableFuture.completedFuture(null);
     }
 
     private void handleGive(CommandSender sender, String[] args) throws SQLException {
@@ -127,5 +138,13 @@ public class TagsAdminCommand {
             return null;
         }
         return uuid.get();
+    }
+
+    private String[] parseArgs(CommandContext context) {
+        String input = context.getInputString();
+        if (input == null || input.isBlank()) {
+            return new String[0];
+        }
+        return input.trim().split("\\s+");
     }
 }
