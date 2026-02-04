@@ -47,6 +47,30 @@ tasks.register("verifyHytaleServerJar") {
     }
 }
 
+tasks.register("verifyCustomUi") {
+    dependsOn("shadowJar")
+    doLast {
+        def invalidUi = file("src/main/resources/Common/UI/Custom/TagsPage.ui")
+        if (invalidUi.exists()) {
+            throw new GradleException("Invalid UI file present: src/main/resources/Common/UI/Custom/TagsPage.ui")
+        }
+        def validUi = file("src/main/resources/Common/UI/Custom/ninjatags/Tags.ui")
+        if (!validUi.exists()) {
+            throw new GradleException("Missing UI file: src/main/resources/Common/UI/Custom/ninjatags/Tags.ui")
+        }
+        def jarFile = tasks.named("shadowJar").get().archiveFile.get().asFile
+        def entries = zipTree(jarFile).matching {
+            include("Common/UI/Custom/TagsPage.ui", "Common/UI/Custom/ninjatags/Tags.ui")
+        }.files*.path
+        if (entries.any { it.endsWith("Common/UI/Custom/TagsPage.ui") }) {
+            throw new GradleException("Invalid UI file packaged in jar: Common/UI/Custom/TagsPage.ui")
+        }
+        if (!entries.any { it.endsWith("Common/UI/Custom/ninjatags/Tags.ui") }) {
+            throw new GradleException("Valid UI file not packaged in jar: Common/UI/Custom/ninjatags/Tags.ui")
+        }
+    }
+}
+
 tasks.named("compileJava") {
     dependsOn("verifyHytaleServerJar")
 }
@@ -65,5 +89,6 @@ tasks.named("assemble") {
 
 tasks.named("build") {
     dependsOn("shadowJar")
+    dependsOn("verifyCustomUi")
     dependsOn("copyPluginJar")
 }
