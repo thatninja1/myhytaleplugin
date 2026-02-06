@@ -106,9 +106,9 @@ public class NinjaTagsPlugin extends JavaPlugin {
             String username = args.get(2);
             String tagId = args.get(3);
 
-            PlayerRef target = Universe.get().getPlayerByUsername(username, NameMatching.EXACT);
+            PlayerRef target = Universe.get().getPlayerByUsername(username, NameMatching.EXACT_IGNORE_CASE);
             if (target == null) {
-                ctx.sendMessage(Message.raw("Player must be online and match exactly: " + username));
+                ctx.sendMessage(Message.raw("Player must be online (name match ignoring case): " + username));
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -181,7 +181,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
         tagRepository.setEquippedTag(playerId, tagId);
         tagRepository.save();
-        feedbackTarget.sendMessage(Message.raw("Equipped tag: " + tag.displayName() + " " + tag.formattedSuffix()));
+        feedbackTarget.sendMessage(Message.raw("Equipped tag: ").append(Message.raw(tag.displayName()).color(tag.hexColor())));
         return true;
     }
 
