@@ -200,7 +200,9 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
     private class TagsMenuPage extends InteractiveCustomUIPage<TagsMenuPage.Data> {
         private static final BuilderCodec<Data> DATA_CODEC = BuilderCodec.builder(Data.class, Data::new)
-                .append(new KeyedCodec<>("@Action", Codec.STRING), (data, value) -> data.action = value, data -> data.action)
+                .append(new KeyedCodec<>("Action", Codec.STRING), (data, value) -> data.action = value, data -> data.action)
+                .add()
+                .append(new KeyedCodec<>("TagId", Codec.STRING), (data, value) -> data.tagId = value, data -> data.tagId)
                 .add()
                 .build();
 
@@ -236,7 +238,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
                 boolean equipped = tagId.equals(equippedId);
                 String labelPath = "#TagLabel" + i;
                 String buttonPath = "#TagButton" + i;
-                String action = equipped ? "deequip" : "equip:" + tagId;
+                String action = equipped ? "unequip" : "equip";
                 String buttonText = equipped ? "De-equip" : "Equip";
 
                 uiCommandBuilder.set(labelPath + ".Visible", true);
@@ -247,7 +249,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
                 uiEventBuilder.addEventBinding(
                         CustomUIEventBindingType.Activating,
                         buttonPath,
-                        EventData.of("@Action", action),
+                        EventData.of("Action", action).append("TagId", tagId),
                         false
                 );
             }
@@ -270,11 +272,10 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
             UUID playerId = playerRef.getUuid();
             getLogger().atInfo().log("TagsMenuPage action for %s: %s", playerId, data.action);
-            if (data.action.equals("deequip")) {
+            if (data.action.equals("unequip")) {
                 deEquip(playerId, player);
-            } else if (data.action.startsWith("equip:")) {
-                String tagId = data.action.substring("equip:".length());
-                equipTag(playerId, tagId, player);
+            } else if (data.action.equals("equip") && data.tagId != null && !data.tagId.isBlank()) {
+                equipTag(playerId, data.tagId, player);
             }
 
             sendUpdate();
@@ -282,6 +283,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
         private static class Data {
             private String action;
+            private String tagId;
         }
     }
 
