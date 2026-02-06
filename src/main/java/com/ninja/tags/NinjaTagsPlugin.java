@@ -243,7 +243,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
                 uiCommandBuilder.set(labelPath + ".Visible", true);
                 uiCommandBuilder.set(buttonPath + ".Visible", true);
-                uiCommandBuilder.set(labelPath + ".TextSpans", Message.raw(tag.displayName() + " " + tag.formattedSuffix()));
+                uiCommandBuilder.set(labelPath + ".TextSpans", Message.raw(tag.displayName()).color(tag.hexColor()));
                 uiCommandBuilder.set(buttonPath + ".TextSpans", Message.raw(buttonText));
 
                 uiEventBuilder.addEventBinding(
@@ -255,6 +255,42 @@ public class NinjaTagsPlugin extends JavaPlugin {
             }
 
             uiCommandBuilder.set("#EmptyLabel.Visible", ownedTags.isEmpty());
+        }
+
+        private void pushLiveUiState(UUID playerId) {
+            UICommandBuilder builder = new UICommandBuilder();
+            String equippedId = tagRepository.getEquippedTag(playerId);
+            List<String> ownedTags = tagRepository.getOwnedTags(playerId);
+
+            for (int i = 0; i < MAX_VISIBLE_TAG_ROWS; i++) {
+                String labelPath = "#TagLabel" + i;
+                String buttonPath = "#TagButton" + i;
+                builder.set(labelPath + ".Visible", false);
+                builder.set(buttonPath + ".Visible", false);
+            }
+
+            for (int i = 0; i < ownedTags.size() && i < MAX_VISIBLE_TAG_ROWS; i++) {
+                String tagId = ownedTags.get(i);
+                TagDefinition tag = tagRepository.getTag(tagId);
+                if (tag == null) {
+                    continue;
+                }
+
+                boolean equipped = tagId.equals(equippedId);
+                String labelPath = "#TagLabel" + i;
+                String buttonPath = "#TagButton" + i;
+                builder.set(labelPath + ".Visible", true);
+                builder.set(buttonPath + ".Visible", true);
+                builder.set(labelPath + ".TextSpans", Message.raw(tag.displayName()).color(tag.hexColor()));
+                builder.set(buttonPath + ".TextSpans", Message.raw(equipped ? "De-equip" : "Equip"));
+            }
+
+            builder.set("#EmptyLabel.Visible", ownedTags.isEmpty());
+            update(false, builder);
+        }
+
+        private void update(boolean clearExistingUi, UICommandBuilder builder) {
+            sendUpdate(builder, clearExistingUi);
         }
 
         @Override
@@ -278,6 +314,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
                 equipTag(playerId, data.tagId, player);
             }
 
+            pushLiveUiState(playerId);
             sendUpdate();
         }
 
