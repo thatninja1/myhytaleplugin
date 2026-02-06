@@ -48,7 +48,7 @@ NinjaTags is a Hytale plugin that provides player tags with LuckPerms suffix int
 
 ## UI assets
 
-- The tags menu layout is defined in `src/main/resources/Common/UI/Custom/TagsMenu.ui`.
+- The tags menu layout is defined in `src/main/resources/Common/UI/Custom/ninjatags/TagsMenu.ui`.
 - `manifest.json` has `"IncludesAssetPack": true` so the UI asset is packaged and loadable by Hytale.
 
 - Asset pack metadata is provided in `src/main/resources/Common/manifest.json` for connect-time asset registration.

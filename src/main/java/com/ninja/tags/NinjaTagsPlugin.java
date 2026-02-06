@@ -48,12 +48,13 @@ public class NinjaTagsPlugin extends JavaPlugin {
         getCommandRegistry().registerCommand(new TagsCommand());
         getCommandRegistry().registerCommand(new TagsAdminCommand());
 
-        boolean hasUiDoc = getClass().getClassLoader().getResource("Common/UI/Custom/TagsMenu.ui") != null;
+        boolean hasUiDoc = getClass().getClassLoader().getResource("Common/UI/Custom/ninjatags/TagsMenu.ui") != null;
         boolean hasUiDocAlt = getClass().getClassLoader().getResource("TagsMenu.ui") != null;
+        boolean hasUiDocShort = getClass().getClassLoader().getResource("ninjatags/TagsMenu.ui") != null;
         boolean hasAssetManifest = getClass().getClassLoader().getResource("Common/manifest.json") != null;
-        getLogger().atInfo().log("NinjaTags loaded. UI resources: Common/UI/Custom/TagsMenu.ui=%s, TagsMenu.ui=%s", hasUiDoc, hasUiDocAlt);
+        getLogger().atInfo().log("NinjaTags loaded. UI resources: Common/UI/Custom/ninjatags/TagsMenu.ui=%s, ninjatags/TagsMenu.ui=%s, TagsMenu.ui=%s", hasUiDoc, hasUiDocShort, hasUiDocAlt);
         getLogger().atInfo().log("NinjaTags asset-pack manifest present: Common/manifest.json=%s", hasAssetManifest);
-        getLogger().atInfo().log("NinjaTags known CustomUI docs: [Common/UI/Custom/TagsMenu.ui]");
+        getLogger().atInfo().log("NinjaTags known CustomUI docs: [ninjatags/TagsMenu.ui]");
     }
 
     @Override
@@ -196,8 +197,8 @@ public class NinjaTagsPlugin extends JavaPlugin {
             List<String> ownedTags = tagRepository.getOwnedTags(playerId);
 
             getLogger().atInfo().log("Building TagsMenuPage for %s (%s). ownedTags=%s equipped=%s", playerRef.getUsername(), playerId, ownedTags.size(), equippedId);
-            getLogger().atInfo().log("Appending CustomUI document: Common/UI/Custom/TagsMenu.ui");
-            uiCommandBuilder.append("Common/UI/Custom/TagsMenu.ui");
+            getLogger().atInfo().log("Appending CustomUI document: ninjatags/TagsMenu.ui");
+            uiCommandBuilder.append("ninjatags/TagsMenu.ui");
             uiCommandBuilder.set("#Title.TextSpans", Message.raw("Ninja Tags"));
 
             for (int i = 0; i < MAX_VISIBLE_TAG_ROWS; i++) {
