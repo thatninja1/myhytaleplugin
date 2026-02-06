@@ -4,9 +4,8 @@ NinjaTags is a Hytale plugin that provides player tags with LuckPerms suffix int
 
 ## Features
 
-- `/tags` opens a text-based menu showing the player's available tags (left side = tag name, right side = equip/de-equip action command).
-- `/tags equip <tagid>` equips a tag the player owns.
-- `/tags deequip` removes the currently equipped tag.
+- `/tags` opens an in-game custom UI page showing tags on the left and equip/de-equip buttons on the right.
+- Tag equip/de-equip is handled directly by UI button clicks (no chat subcommands required).
 - `/tagsadmin givetag <player> <tagid>` gives a tag to a player.
 - `/tagsadmin removetag <player> <tagid>` removes a tag from a player.
 - Player tag ownership is saved to JSON (`player-tags.json`) in the plugin data folder.
@@ -45,3 +44,9 @@ NinjaTags is a Hytale plugin that provides player tags with LuckPerms suffix int
 2. Ensure Java 25 is installed and available to Gradle toolchains.
 3. Run `gradle build`.
 4. Find the plugin jar in `build/libs/` (and `dist/` if the copy task runs).
+
+
+## UI assets
+
+- The tags menu layout is defined in `src/main/resources/Common/UI/Custom/TagsMenu.ui`.
+- `manifest.json` has `"IncludesAssetPack": true` so the UI asset is packaged and loadable by Hytale.

@@ -1,0 +1,43 @@
+$Common = "Common.ui";
+
+Group {
+  LayoutMode: Center;
+
+  Group #RootPanel {
+    Anchor: (Width: 900, Height: 760);
+    LayoutMode: Top;
+    Background: $Common.@DialogBackground;
+    Padding: (Full: 16);
+
+    Label #Title {
+      Style: (FontSize: 42, Alignment: Center);
+      Anchor: (Top: 0, Width: Fill, Height: 60);
+      Text: "Ninja Tags";
+    }
+
+    Label #EmptyLabel {
+      Style: (FontSize: 26, Alignment: Center);
+      Anchor: (Top: 8, Width: Fill, Height: 44);
+      Text: "You don't own any tags yet.";
+      Visible: false;
+    }
+
+    Group #Rows {
+      Anchor: (Top: 16, Width: Fill, Height: Fill);
+      LayoutMode: Top;
+
+      Group #Row0 { LayoutMode: Left; Anchor: (Width: Fill, Height: 46); Label #TagLabel0 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton0 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row1 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel1 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton1 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row2 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel2 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton2 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row3 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel3 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton3 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row4 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel4 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton4 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row5 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel5 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton5 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row6 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel6 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton6 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row7 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel7 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton7 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row8 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel8 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton8 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row9 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel9 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton9 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row10 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel10 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton10 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+      Group #Row11 { LayoutMode: Left; Anchor: (Top: 6, Width: Fill, Height: 46); Label #TagLabel11 { Anchor: (Width: 640, Height: 42); Text: ""; } Button #TagButton11 { Anchor: (Width: 180, Height: 42); Text: "Equip"; } }
+    }
+  }
+}

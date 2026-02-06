@@ -1,15 +1,27 @@
 package com.ninja.tags;
 
+import com.hypixel.hytale.codec.Codec;
+import com.hypixel.hytale.codec.KeyedCodec;
+import com.hypixel.hytale.codec.builder.BuilderCodec;
+import com.hypixel.hytale.component.Ref;
+import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
+import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.NameMatching;
 import com.hypixel.hytale.server.core.command.system.AbstractCommand;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.core.ui.builder.EventData;
+import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
+import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
+import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +30,8 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class NinjaTagsPlugin extends JavaPlugin {
+    private static final int MAX_VISIBLE_TAG_ROWS = 12;
+
     private TagRepository tagRepository;
     private LuckPermsTagService luckPermsTagService;
 
@@ -43,58 +57,20 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
     private class TagsCommand extends AbstractCommand {
         private TagsCommand() {
-            super("tags", "Opens the tags menu");
-            setAllowsExtraArguments(true);
+            super("tags", "Opens the tags menu UI");
+            setAllowsExtraArguments(false);
         }
 
         @Override
         protected CompletableFuture<Void> execute(CommandContext ctx) {
-            if (!(ctx.sender() instanceof Player player)) {
+            if (!ctx.isPlayer()) {
                 ctx.sendMessage(Message.raw("Only players can use /tags."));
                 return CompletableFuture.completedFuture(null);
             }
 
-            List<String> args = parseInput(ctx.getInputString());
-            if (args.size() >= 3 && args.get(1).equalsIgnoreCase("equip")) {
-                equipTag(player, args.get(2), ctx.sender());
-                return CompletableFuture.completedFuture(null);
-            }
-
-            if (args.size() >= 2 && args.get(1).equalsIgnoreCase("deequip")) {
-                deEquip(player, ctx.sender());
-                return CompletableFuture.completedFuture(null);
-            }
-
-            sendTagsMenu(player);
+            Ref<EntityStore> playerRef = ctx.senderAsPlayerRef();
+            openTagsPage(playerRef, playerRef.getStore());
             return CompletableFuture.completedFuture(null);
-        }
-
-        @SuppressWarnings("removal")
-        private void sendTagsMenu(Player player) {
-            UUID playerId = player.getUuid();
-            String equipped = tagRepository.getEquippedTag(playerId);
-            List<String> ownedTags = tagRepository.getOwnedTags(playerId);
-
-            player.sendMessage(Message.raw("=== Ninja Tags ===").color("#F2C94C").bold(true));
-            if (ownedTags.isEmpty()) {
-                player.sendMessage(Message.raw("You don't own any tags yet."));
-                return;
-            }
-
-            player.sendMessage(Message.raw("Tag (left) | Action (right)").color("#808080"));
-            for (String tagId : ownedTags) {
-                TagDefinition tag = tagRepository.getTag(tagId);
-                if (tag == null) {
-                    continue;
-                }
-                String status = tagId.equals(equipped) ? "De-equip" : "Equip";
-                String command = tagId.equals(equipped) ? "/tags deequip" : "/tags equip " + tagId;
-
-                Message line = Message.raw("• " + tag.displayName() + " " + tag.formattedSuffix())
-                        .color("#FFFFFF")
-                        .insert(Message.raw(" | " + status + " via: " + command).color("#6FCF97"));
-                player.sendMessage(line);
-            }
         }
     }
 
@@ -149,42 +125,132 @@ public class NinjaTagsPlugin extends JavaPlugin {
         }
     }
 
-    @SuppressWarnings("removal")
-    private void equipTag(Player player, String tagId, CommandSender feedbackTarget) {
-        UUID playerId = player.getUuid();
+    private void openTagsPage(Ref<EntityStore> ref, Store<EntityStore> store) {
+        Player player = store.getComponent(ref, Player.getComponentType());
+        PlayerRef playerRef = store.getComponent(ref, Universe.get().getPlayerRefComponentType());
+        if (player == null || playerRef == null) {
+            return;
+        }
+        player.getPageManager().openCustomPage(ref, store, new TagsMenuPage(playerRef));
+    }
+
+    private boolean equipTag(UUID playerId, String tagId, CommandSender feedbackTarget) {
         if (!tagRepository.playerHasTag(playerId, tagId)) {
             feedbackTarget.sendMessage(Message.raw("You do not own tag id: " + tagId));
-            return;
+            return false;
         }
 
         TagDefinition tag = tagRepository.getTag(tagId);
         if (tag == null) {
             feedbackTarget.sendMessage(Message.raw("Unknown tag id: " + tagId));
-            return;
+            return false;
         }
 
         boolean ok = luckPermsTagService.applyManagedSuffix(playerId, tag.formattedSuffix(), feedbackTarget);
         if (!ok) {
-            return;
+            return false;
         }
 
         tagRepository.setEquippedTag(playerId, tagId);
         tagRepository.save();
         feedbackTarget.sendMessage(Message.raw("Equipped tag: " + tag.displayName() + " " + tag.formattedSuffix()));
+        return true;
     }
 
-    @SuppressWarnings("removal")
-    private void deEquip(Player player, CommandSender feedbackTarget) {
-        UUID playerId = player.getUuid();
+    private boolean deEquip(UUID playerId, CommandSender feedbackTarget) {
         if (tagRepository.getEquippedTag(playerId) == null) {
             feedbackTarget.sendMessage(Message.raw("You do not have a tag equipped."));
-            return;
+            return false;
         }
 
         luckPermsTagService.clearManagedSuffix(playerId, feedbackTarget);
         tagRepository.setEquippedTag(playerId, null);
         tagRepository.save();
         feedbackTarget.sendMessage(Message.raw("Tag de-equipped."));
+        return true;
+    }
+
+    private class TagsMenuPage extends InteractiveCustomUIPage<TagsMenuPage.Data> {
+        private static final BuilderCodec<Data> DATA_CODEC = BuilderCodec.builder(Data.class, Data::new)
+                .append(new KeyedCodec<>("@Action", Codec.STRING), (data, value) -> data.action = value, data -> data.action)
+                .add()
+                .build();
+
+        private TagsMenuPage(PlayerRef playerRef) {
+            super(playerRef, CustomPageLifetime.CanDismissOrCloseThroughInteraction, DATA_CODEC);
+        }
+
+        @Override
+        public void build(Ref<EntityStore> ref, UICommandBuilder uiCommandBuilder, UIEventBuilder uiEventBuilder, Store<EntityStore> store) {
+            UUID playerId = playerRef.getUuid();
+            String equippedId = tagRepository.getEquippedTag(playerId);
+            List<String> ownedTags = tagRepository.getOwnedTags(playerId);
+
+            uiCommandBuilder.append("TagsMenu.ui");
+            uiCommandBuilder.set("#Title.TextSpans", Message.raw("Ninja Tags"));
+
+            for (int i = 0; i < MAX_VISIBLE_TAG_ROWS; i++) {
+                String labelPath = "#TagLabel" + i;
+                String buttonPath = "#TagButton" + i;
+                uiCommandBuilder.set(labelPath + ".Visible", false);
+                uiCommandBuilder.set(buttonPath + ".Visible", false);
+            }
+
+            for (int i = 0; i < ownedTags.size() && i < MAX_VISIBLE_TAG_ROWS; i++) {
+                String tagId = ownedTags.get(i);
+                TagDefinition tag = tagRepository.getTag(tagId);
+                if (tag == null) {
+                    continue;
+                }
+
+                boolean equipped = tagId.equals(equippedId);
+                String labelPath = "#TagLabel" + i;
+                String buttonPath = "#TagButton" + i;
+                String action = equipped ? "deequip" : "equip:" + tagId;
+                String buttonText = equipped ? "De-equip" : "Equip";
+
+                uiCommandBuilder.set(labelPath + ".Visible", true);
+                uiCommandBuilder.set(buttonPath + ".Visible", true);
+                uiCommandBuilder.set(labelPath + ".TextSpans", Message.raw(tag.displayName() + " " + tag.formattedSuffix()));
+                uiCommandBuilder.set(buttonPath + ".TextSpans", Message.raw(buttonText));
+
+                uiEventBuilder.addEventBinding(
+                        CustomUIEventBindingType.Activating,
+                        buttonPath,
+                        EventData.of("@Action", action),
+                        false
+                );
+            }
+
+            uiCommandBuilder.set("#EmptyLabel.Visible", ownedTags.isEmpty());
+        }
+
+        @Override
+        public void handleDataEvent(Ref<EntityStore> ref, Store<EntityStore> store, Data data) {
+            if (data == null || data.action == null || data.action.isBlank()) {
+                sendUpdate();
+                return;
+            }
+
+            Player player = store.getComponent(ref, Player.getComponentType());
+            if (player == null) {
+                return;
+            }
+
+            UUID playerId = playerRef.getUuid();
+            if (data.action.equals("deequip")) {
+                deEquip(playerId, player);
+            } else if (data.action.startsWith("equip:")) {
+                String tagId = data.action.substring("equip:".length());
+                equipTag(playerId, tagId, player);
+            }
+
+            sendUpdate();
+        }
+
+        private static class Data {
+            private String action;
+        }
     }
 
     private static List<String> parseInput(String input) {
