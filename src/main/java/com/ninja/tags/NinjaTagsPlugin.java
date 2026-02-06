@@ -181,7 +181,12 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
         tagRepository.setEquippedTag(playerId, tagId);
         tagRepository.save();
-        feedbackTarget.sendMessage(Message.raw("Equipped tag: ").append(Message.raw(tag.displayName()).color(tag.hexColor())));
+        feedbackTarget.sendMessage(
+                Message.join(
+                        Message.raw("Equipped tag: "),
+                        Message.raw(tag.displayName()).color(tag.hexColor())
+                )
+        );
         return true;
     }
 
