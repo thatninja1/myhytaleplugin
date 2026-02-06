@@ -75,9 +75,14 @@ public class NinjaTagsPlugin extends JavaPlugin {
                 return CompletableFuture.completedFuture(null);
             }
 
-            Ref<EntityStore> playerRef = ctx.senderAsPlayerRef();
+            Player player = ctx.senderAs(Player.class);
             getLogger().atInfo().log("/tags invoked by sender=%s", ctx.sender());
-            openTagsPage(playerRef, playerRef.getStore());
+            if (player == null || player.getWorld() == null) {
+                ctx.sendMessage(Message.raw("Could not open tags UI: player world not available."));
+                return CompletableFuture.completedFuture(null);
+            }
+
+            player.getWorld().execute(() -> openTagsPage(player));
             return CompletableFuture.completedFuture(null);
         }
     }
@@ -133,13 +138,26 @@ public class NinjaTagsPlugin extends JavaPlugin {
         }
     }
 
-    private void openTagsPage(Ref<EntityStore> ref, Store<EntityStore> store) {
-        Player player = store.getComponent(ref, Player.getComponentType());
-        PlayerRef playerRef = store.getComponent(ref, Universe.get().getPlayerRefComponentType());
-        if (player == null || playerRef == null) {
-            getLogger().atWarning().log("/tags open failed: player=%s playerRef=%s", player != null, playerRef != null);
+    @SuppressWarnings("removal")
+    private void openTagsPage(Player player) {
+        if (player == null) {
+            getLogger().atWarning().log("/tags open failed: player was null");
             return;
         }
+
+        if (player.getWorld() == null) {
+            getLogger().atWarning().log("/tags open failed: world was null for player=%s", player);
+            return;
+        }
+
+        Ref<EntityStore> ref = player.getReference();
+        Store<EntityStore> store = player.getWorld().getEntityStore();
+        PlayerRef playerRef = player.getPlayerRef();
+        if (ref == null || store == null || playerRef == null) {
+            getLogger().atWarning().log("/tags open failed: ref=%s store=%s playerRef=%s", ref != null, store != null, playerRef != null);
+            return;
+        }
+
         getLogger().atInfo().log("Opening TagsMenuPage for %s (%s)", playerRef.getUsername(), playerRef.getUuid());
         player.getPageManager().openCustomPage(ref, store, new TagsMenuPage(playerRef));
     }
