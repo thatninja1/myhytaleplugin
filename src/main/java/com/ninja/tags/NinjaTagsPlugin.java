@@ -51,13 +51,10 @@ public class NinjaTagsPlugin extends JavaPlugin {
         boolean hasUiDoc = getClass().getClassLoader().getResource("Common/UI/Custom/ninjatags/TagsMenu.ui") != null;
         boolean hasUiDocAlt = getClass().getClassLoader().getResource("TagsMenu.ui") != null;
         boolean hasUiDocShort = getClass().getClassLoader().getResource("ninjatags/TagsMenu.ui") != null;
-        boolean hasFallbackHudDoc = getClass().getClassLoader().getResource("Common/UI/HUD/MultipleHUD.ui") != null;
         boolean hasAssetManifest = getClass().getClassLoader().getResource("Common/manifest.json") != null;
         getLogger().atInfo().log("NinjaTags loaded. UI resources: Common/UI/Custom/ninjatags/TagsMenu.ui=%s, ninjatags/TagsMenu.ui=%s, TagsMenu.ui=%s", hasUiDoc, hasUiDocShort, hasUiDocAlt);
-        getLogger().atInfo().log("NinjaTags fallback HUD resource: Common/UI/HUD/MultipleHUD.ui=%s", hasFallbackHudDoc);
         getLogger().atInfo().log("NinjaTags asset-pack manifest present: Common/manifest.json=%s", hasAssetManifest);
-        getLogger().atInfo().log("NinjaTags known CustomUI docs: [ninjatags/TagsMenu.ui, HUD/MultipleHUD.ui]");
-        getLogger().atInfo().log("NinjaTags append calls: [ninjatags/TagsMenu.ui]");
+        getLogger().atInfo().log("NinjaTags known CustomUI docs: [ninjatags/TagsMenu.ui]");
     }
 
     @Override
