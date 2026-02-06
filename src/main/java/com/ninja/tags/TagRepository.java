@@ -67,7 +67,7 @@ public class TagRepository {
                 }
             }
         } catch (IOException e) {
-            logger.severe("Failed to load tag data", e);
+            logger.atSevere().withCause(e).log("Failed to load tag data");
         }
     }
 
@@ -78,7 +78,7 @@ public class TagRepository {
                 gson.toJson(players, PLAYER_DATA_TYPE, out);
             }
         } catch (IOException e) {
-            logger.severe("Failed to save tag data", e);
+            logger.atSevere().withCause(e).log("Failed to save tag data");
         }
     }
 

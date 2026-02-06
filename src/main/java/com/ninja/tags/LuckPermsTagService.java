@@ -8,7 +8,7 @@ import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
-import net.luckperms.api.node.types.ChatMetaNode;
+import net.luckperms.api.node.types.SuffixNode;
 import net.luckperms.api.node.types.MetaNode;
 
 import java.util.UUID;
@@ -31,7 +31,7 @@ public class LuckPermsTagService {
 
         luckPerms.getUserManager().modifyUser(playerId, user -> {
             clearManagedNodes(user);
-            ChatMetaNode suffixNode = ChatMetaNode.builder(suffix, TAG_PRIORITY).build();
+            SuffixNode suffixNode = SuffixNode.builder(suffix, TAG_PRIORITY).build();
             MetaNode marker = MetaNode.builder(META_KEY, suffix).build();
             user.data().add(suffixNode);
             user.data().add(marker);
@@ -62,7 +62,7 @@ public class LuckPermsTagService {
                 continue;
             }
             if (NodeType.SUFFIX.matches(node)) {
-                ChatMetaNode chatMeta = NodeType.SUFFIX.cast(node);
+                SuffixNode chatMeta = NodeType.SUFFIX.cast(node);
                 if (chatMeta.getPriority() == TAG_PRIORITY) {
                     user.data().remove(node);
                 }
@@ -74,7 +74,7 @@ public class LuckPermsTagService {
         try {
             return LuckPermsProvider.get();
         } catch (IllegalStateException ex) {
-            logger.warning("LuckPerms was not available while processing tags.");
+            logger.atWarning().log("LuckPerms was not available while processing tags.");
             feedbackTarget.sendMessage(Message.raw("LuckPerms is not loaded; cannot change suffix."));
             return null;
         }

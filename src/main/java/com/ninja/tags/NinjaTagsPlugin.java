@@ -33,7 +33,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new TagsCommand());
         getCommandRegistry().registerCommand(new TagsAdminCommand());
-        getLogger().info("NinjaTags loaded.");
+        getLogger().atInfo().log("NinjaTags loaded.");
     }
 
     @Override
@@ -70,7 +70,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         }
 
         private void sendTagsMenu(Player player) {
-            UUID playerId = player.getPlayerRef().getUuid();
+            UUID playerId = player.getUuid();
             String equipped = tagRepository.getEquippedTag(playerId);
             List<String> ownedTags = tagRepository.getOwnedTags(playerId);
 
@@ -149,7 +149,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
     }
 
     private void equipTag(Player player, String tagId, CommandSender feedbackTarget) {
-        UUID playerId = player.getPlayerRef().getUuid();
+        UUID playerId = player.getUuid();
         if (!tagRepository.playerHasTag(playerId, tagId)) {
             feedbackTarget.sendMessage(Message.raw("You do not own tag id: " + tagId));
             return;
@@ -172,7 +172,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
     }
 
     private void deEquip(Player player, CommandSender feedbackTarget) {
-        UUID playerId = player.getPlayerRef().getUuid();
+        UUID playerId = player.getUuid();
         if (tagRepository.getEquippedTag(playerId) == null) {
             feedbackTarget.sendMessage(Message.raw("You do not have a tag equipped."));
             return;
