@@ -108,12 +108,27 @@ public class NinjaTagsPlugin extends JavaPlugin {
             }
 
             List<String> args = parseInput(ctx.getInputString());
+            if (args.size() < 2) {
+                ctx.sendMessage(Message.raw("Usage: /tagsadmin <givetag|removetag|reload> [player] [tagid]"));
+                return CompletableFuture.completedFuture(null);
+            }
+
+            String sub = args.get(1).toLowerCase(Locale.ROOT);
+            if (sub.equals("reload")) {
+                int count = tagRepository.reloadTags();
+                if (count >= 0) {
+                    ctx.sendMessage(Message.raw("Reloaded tags.json (" + count + " tags loaded)."));
+                } else {
+                    ctx.sendMessage(Message.raw("Failed to reload tags.json. Check server logs for details."));
+                }
+                return CompletableFuture.completedFuture(null);
+            }
+
             if (args.size() < 4) {
                 ctx.sendMessage(Message.raw("Usage: /tagsadmin <givetag|removetag> <player> <tagid>"));
                 return CompletableFuture.completedFuture(null);
             }
 
-            String sub = args.get(1).toLowerCase(Locale.ROOT);
             String username = args.get(2);
             String tagId = args.get(3);
 
