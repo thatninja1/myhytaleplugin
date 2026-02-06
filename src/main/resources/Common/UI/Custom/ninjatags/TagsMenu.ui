@@ -1,0 +1,43 @@
+$C = "../Common.ui";
+
+$C.@PageOverlay {
+  Group {
+    LayoutMode: Center;
+    Anchor: (Full: 1);
+
+    Group #RootPanel {
+      Anchor: (Width: 1000, Height: 760);
+      LayoutMode: Top;
+      Background: #10151c(0.96);
+      Padding: (Left: 20, Top: 16, Right: 20, Bottom: 16);
+
+      Label #Title {
+        Anchor: (Height: 40);
+        Text: "Ninja Tags";
+        Style: (FontSize: 28, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center);
+      }
+
+      Label #EmptyLabel {
+        Anchor: (Height: 26);
+        Text: "You don't own any tags yet.";
+        Style: (FontSize: 16, TextColor: #d1d5db, HorizontalAlignment: Center);
+        Visible: false;
+      }
+
+      Group { Anchor: (Height: 10); }
+
+      Group #Row0 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel0 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton0 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row1 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel1 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton1 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row2 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel2 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton2 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row3 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel3 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton3 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row4 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel4 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton4 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row5 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel5 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton5 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row6 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel6 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton6 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row7 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel7 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton7 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row8 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel8 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton8 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row9 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel9 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton9 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row10 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel10 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton10 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+      Group #Row11 { LayoutMode: Left; Anchor: (Height: 44); Label #TagLabel11 { Anchor: (Width: 760, Height: 40); Text: ""; Style: (FontSize: 16, TextColor: #ffffff); } $C.@SmallSecondaryTextButton #TagButton11 { Anchor: (Width: 180, Height: 36); Text: "Equip"; } }
+    }
+  }
+}
