@@ -53,3 +53,9 @@ NinjaTags is a Hytale plugin that provides player tags with LuckPerms suffix int
 
 - Asset pack metadata is provided in `src/main/resources/Common/manifest.json` for connect-time asset registration.
 
+
+
+## Permissions
+
+- `ninjatags.tags` — required to run `/tags` and open the tags UI.
+- `ninjatags.tagsadmin` — required to run `/tagsadmin` admin subcommands (give/remove tag).

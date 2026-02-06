@@ -66,10 +66,16 @@ public class NinjaTagsPlugin extends JavaPlugin {
         private TagsCommand() {
             super("tags", "Opens the tags menu UI");
             setAllowsExtraArguments(false);
+            requirePermission("ninjatags.tags");
         }
 
         @Override
         protected CompletableFuture<Void> execute(CommandContext ctx) {
+            if (!ctx.sender().hasPermission("ninjatags.tags")) {
+                ctx.sendMessage(Message.raw("No permission: ninjatags.tags"));
+                return CompletableFuture.completedFuture(null);
+            }
+
             if (!ctx.isPlayer()) {
                 ctx.sendMessage(Message.raw("Only players can use /tags."));
                 return CompletableFuture.completedFuture(null);
@@ -91,11 +97,16 @@ public class NinjaTagsPlugin extends JavaPlugin {
         private TagsAdminCommand() {
             super("tagsadmin", "Admin controls for NinjaTags");
             setAllowsExtraArguments(true);
-            requirePermission("ninjatags.admin");
+            requirePermission("ninjatags.tagsadmin");
         }
 
         @Override
         protected CompletableFuture<Void> execute(CommandContext ctx) {
+            if (!ctx.sender().hasPermission("ninjatags.tagsadmin")) {
+                ctx.sendMessage(Message.raw("No permission: ninjatags.tagsadmin"));
+                return CompletableFuture.completedFuture(null);
+            }
+
             List<String> args = parseInput(ctx.getInputString());
             if (args.size() < 4) {
                 ctx.sendMessage(Message.raw("Usage: /tagsadmin <givetag|removetag> <player> <tagid>"));
