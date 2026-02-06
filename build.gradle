@@ -18,11 +18,19 @@ repositories {
     mavenCentral()
 }
 
+configurations.configureEach {
+    // Prevent shading SLF4J API/bindings into the plugin jar.
+    exclude group: 'org.slf4j'
+    exclude group: 'ch.qos.logback'
+}
+
 dependencies {
     compileOnly(files("libs/HytaleServer.jar"))
     compileOnly 'net.luckperms:api:5.4'
 
-    implementation 'org.xerial:sqlite-jdbc:3.46.0.0'
+    implementation('org.xerial:sqlite-jdbc:3.46.0.0') {
+        exclude group: 'org.slf4j'
+    }
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'org.yaml:snakeyaml:2.2'
 }
@@ -33,6 +41,10 @@ shadowJar {
     relocate 'com.google.gson', 'com.ninja.tags.shaded.gson'
     relocate 'org.yaml.snakeyaml', 'com.ninja.tags.shaded.snakeyaml'
     mergeServiceFiles()
+    dependencies {
+        exclude(dependency('org.slf4j:.*:.*'))
+        exclude(dependency('ch.qos.logback:.*:.*'))
+    }
 }
 
 jar {
