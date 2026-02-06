@@ -1,0 +1,16 @@
+{
+  "Group": "Ninja",
+  "Name": "NinjaTags",
+  "Version": "1.0.0",
+  "Description": "Tag management plugin with LuckPerms suffix integration",
+  "Authors": [{"Name": "Ninja"}],
+  "Website": "https://example.com",
+  "ServerVersion": "*",
+  "Dependencies": {},
+  "OptionalDependencies": {
+    "LuckPerms": "*"
+  },
+  "DisabledByDefault": false,
+  "Main": "com.ninja.tags.NinjaTagsPlugin",
+  "IncludesAssetPack": false
+}
