@@ -151,7 +151,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         }
 
         Ref<EntityStore> ref = player.getReference();
-        Store<EntityStore> store = player.getWorld().getEntityStore();
+        Store<EntityStore> store = player.getWorld().getEntityStore().getStore();
         PlayerRef playerRef = player.getPlayerRef();
         if (ref == null || store == null || playerRef == null) {
             getLogger().atWarning().log("/tags open failed: ref=%s store=%s playerRef=%s", ref != null, store != null, playerRef != null);
