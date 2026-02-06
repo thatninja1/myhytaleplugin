@@ -47,7 +47,10 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
         getCommandRegistry().registerCommand(new TagsCommand());
         getCommandRegistry().registerCommand(new TagsAdminCommand());
-        getLogger().atInfo().log("NinjaTags loaded.");
+
+        boolean hasUiDoc = getClass().getClassLoader().getResource("Common/UI/Custom/TagsMenu.ui") != null;
+        boolean hasUiDocAlt = getClass().getClassLoader().getResource("TagsMenu.ui") != null;
+        getLogger().atInfo().log("NinjaTags loaded. UI resources: Common/UI/Custom/TagsMenu.ui=%s, TagsMenu.ui=%s", hasUiDoc, hasUiDocAlt);
     }
 
     @Override
@@ -129,8 +132,10 @@ public class NinjaTagsPlugin extends JavaPlugin {
         Player player = store.getComponent(ref, Player.getComponentType());
         PlayerRef playerRef = store.getComponent(ref, Universe.get().getPlayerRefComponentType());
         if (player == null || playerRef == null) {
+            getLogger().atWarning().log("/tags open failed: player=%s playerRef=%s", player != null, playerRef != null);
             return;
         }
+        getLogger().atInfo().log("Opening TagsMenuPage for %s (%s)", playerRef.getUsername(), playerRef.getUuid());
         player.getPageManager().openCustomPage(ref, store, new TagsMenuPage(playerRef));
     }
 
@@ -186,6 +191,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             String equippedId = tagRepository.getEquippedTag(playerId);
             List<String> ownedTags = tagRepository.getOwnedTags(playerId);
 
+            getLogger().atInfo().log("Building TagsMenuPage for %s (%s). ownedTags=%s equipped=%s", playerRef.getUsername(), playerId, ownedTags.size(), equippedId);
             uiCommandBuilder.append("TagsMenu.ui");
             uiCommandBuilder.set("#Title.TextSpans", Message.raw("Ninja Tags"));
 
@@ -228,6 +234,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         @Override
         public void handleDataEvent(Ref<EntityStore> ref, Store<EntityStore> store, Data data) {
             if (data == null || data.action == null || data.action.isBlank()) {
+                getLogger().atWarning().log("TagsMenuPage event had empty action for %s", playerRef.getUuid());
                 sendUpdate();
                 return;
             }
@@ -238,6 +245,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             }
 
             UUID playerId = playerRef.getUuid();
+            getLogger().atInfo().log("TagsMenuPage action for %s: %s", playerId, data.action);
             if (data.action.equals("deequip")) {
                 deEquip(playerId, player);
             } else if (data.action.startsWith("equip:")) {

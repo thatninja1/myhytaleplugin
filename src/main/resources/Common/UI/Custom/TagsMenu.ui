@@ -1,12 +1,9 @@
-$Common = "Common.ui";
-
 Group {
   LayoutMode: Center;
 
   Group #RootPanel {
     Anchor: (Width: 900, Height: 760);
     LayoutMode: Top;
-    Background: $Common.@DialogBackground;
     Padding: (Full: 16);
 
     Label #Title {
