@@ -51,6 +51,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         boolean hasUiDoc = getClass().getClassLoader().getResource("Common/UI/Custom/TagsMenu.ui") != null;
         boolean hasUiDocAlt = getClass().getClassLoader().getResource("TagsMenu.ui") != null;
         getLogger().atInfo().log("NinjaTags loaded. UI resources: Common/UI/Custom/TagsMenu.ui=%s, TagsMenu.ui=%s", hasUiDoc, hasUiDocAlt);
+        getLogger().atInfo().log("NinjaTags known CustomUI docs: [Common/UI/Custom/TagsMenu.ui]");
     }
 
     @Override
@@ -193,6 +194,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             List<String> ownedTags = tagRepository.getOwnedTags(playerId);
 
             getLogger().atInfo().log("Building TagsMenuPage for %s (%s). ownedTags=%s equipped=%s", playerRef.getUsername(), playerId, ownedTags.size(), equippedId);
+            getLogger().atInfo().log("Appending CustomUI document: Common/UI/Custom/TagsMenu.ui");
             uiCommandBuilder.append("Common/UI/Custom/TagsMenu.ui");
             uiCommandBuilder.set("#Title.TextSpans", Message.raw("Ninja Tags"));
 
