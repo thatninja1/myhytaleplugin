@@ -28,9 +28,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NinjaTagsPlugin extends JavaPlugin {
     private static final int MAX_VISIBLE_TAG_ROWS = 12;
+    private static final Pattern INLINE_HEX_PATTERN = Pattern.compile("&#([0-9a-fA-F]{6})");
 
     private TagRepository tagRepository;
     private LuckPermsTagService luckPermsTagService;
@@ -210,7 +213,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         feedbackTarget.sendMessage(
                 Message.join(
                         Message.raw("Equipped tag: "),
-                        Message.raw(tag.displayName()).color(tag.hexColor())
+                        parseTagText(tag)
                 )
         );
         return true;
@@ -271,7 +274,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
                 uiCommandBuilder.set(labelPath + ".Visible", true);
                 uiCommandBuilder.set(buttonPath + ".Visible", true);
-                uiCommandBuilder.set(labelPath + ".TextSpans", Message.raw(tag.displayName()).color(tag.hexColor()));
+                uiCommandBuilder.set(labelPath + ".TextSpans", parseTagText(tag));
                 uiCommandBuilder.set(buttonPath + ".TextSpans", Message.raw(buttonText));
 
                 uiEventBuilder.addEventBinding(
@@ -309,7 +312,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
                 String buttonPath = "#TagButton" + i;
                 builder.set(labelPath + ".Visible", true);
                 builder.set(buttonPath + ".Visible", true);
-                builder.set(labelPath + ".TextSpans", Message.raw(tag.displayName()).color(tag.hexColor()));
+                builder.set(labelPath + ".TextSpans", parseTagText(tag));
                 builder.set(buttonPath + ".TextSpans", Message.raw(equipped ? "De-equip" : "Equip"));
             }
 
@@ -351,6 +354,55 @@ public class NinjaTagsPlugin extends JavaPlugin {
         private static class Data {
             private String tagId;
         }
+    }
+
+    private static Message parseTagText(TagDefinition tag) {
+        if (tag == null) {
+            return Message.raw("");
+        }
+
+        String sourceText = tag.text();
+        if (sourceText == null || sourceText.isBlank()) {
+            return Message.raw(tag.displayName() == null ? "" : tag.displayName()).color(tag.hexColor());
+        }
+
+        Matcher matcher = INLINE_HEX_PATTERN.matcher(sourceText);
+        List<Message> segments = new ArrayList<>();
+        int cursor = 0;
+        String currentColor = tag.hexColor();
+
+        while (matcher.find()) {
+            if (matcher.start() > cursor) {
+                String chunk = sourceText.substring(cursor, matcher.start());
+                if (!chunk.isEmpty()) {
+                    Message part = Message.raw(chunk);
+                    if (currentColor != null && !currentColor.isBlank()) {
+                        part.color(currentColor);
+                    }
+                    segments.add(part);
+                }
+            }
+
+            currentColor = "#" + matcher.group(1);
+            cursor = matcher.end();
+        }
+
+        if (cursor < sourceText.length()) {
+            String trailing = sourceText.substring(cursor);
+            if (!trailing.isEmpty()) {
+                Message part = Message.raw(trailing);
+                if (currentColor != null && !currentColor.isBlank()) {
+                    part.color(currentColor);
+                }
+                segments.add(part);
+            }
+        }
+
+        if (segments.isEmpty()) {
+            return Message.raw("");
+        }
+
+        return Message.join(segments.toArray(new Message[0]));
     }
 
     private static List<String> parseInput(String input) {

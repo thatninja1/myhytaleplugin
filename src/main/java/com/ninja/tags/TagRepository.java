@@ -169,9 +169,6 @@ public class TagRepository {
         if (tag.hexColor() == null || !tag.hexColor().matches("#[0-9a-fA-F]{6}")) {
             throw new IllegalArgumentException("Tag hexColor must be #RRGGBB (id=" + tag.id() + ")");
         }
-        if (tag.text() == null || tag.text().isBlank()) {
-            throw new IllegalArgumentException("Tag text cannot be empty (id=" + tag.id() + ")");
-        }
     }
 
     private void ensureDefaultTagsFile() throws IOException {
