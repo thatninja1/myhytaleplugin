@@ -69,6 +69,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             return CompletableFuture.completedFuture(null);
         }
 
+        @SuppressWarnings("removal")
         private void sendTagsMenu(Player player) {
             UUID playerId = player.getUuid();
             String equipped = tagRepository.getEquippedTag(playerId);
@@ -148,6 +149,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         }
     }
 
+    @SuppressWarnings("removal")
     private void equipTag(Player player, String tagId, CommandSender feedbackTarget) {
         UUID playerId = player.getUuid();
         if (!tagRepository.playerHasTag(playerId, tagId)) {
@@ -171,6 +173,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
         feedbackTarget.sendMessage(Message.raw("Equipped tag: " + tag.displayName() + " " + tag.formattedSuffix()));
     }
 
+    @SuppressWarnings("removal")
     private void deEquip(Player player, CommandSender feedbackTarget) {
         UUID playerId = player.getUuid();
         if (tagRepository.getEquippedTag(playerId) == null) {
