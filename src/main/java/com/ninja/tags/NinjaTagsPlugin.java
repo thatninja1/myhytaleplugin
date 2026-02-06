@@ -72,6 +72,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             }
 
             Ref<EntityStore> playerRef = ctx.senderAsPlayerRef();
+            getLogger().atInfo().log("/tags invoked by sender=%s", ctx.sender());
             openTagsPage(playerRef, playerRef.getStore());
             return CompletableFuture.completedFuture(null);
         }
@@ -192,7 +193,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             List<String> ownedTags = tagRepository.getOwnedTags(playerId);
 
             getLogger().atInfo().log("Building TagsMenuPage for %s (%s). ownedTags=%s equipped=%s", playerRef.getUsername(), playerId, ownedTags.size(), equippedId);
-            uiCommandBuilder.append("TagsMenu.ui");
+            uiCommandBuilder.append("Common/UI/Custom/TagsMenu.ui");
             uiCommandBuilder.set("#Title.TextSpans", Message.raw("Ninja Tags"));
 
             for (int i = 0; i < MAX_VISIBLE_TAG_ROWS; i++) {
