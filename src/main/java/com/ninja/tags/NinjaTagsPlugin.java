@@ -50,7 +50,9 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
         boolean hasUiDoc = getClass().getClassLoader().getResource("Common/UI/Custom/TagsMenu.ui") != null;
         boolean hasUiDocAlt = getClass().getClassLoader().getResource("TagsMenu.ui") != null;
+        boolean hasAssetManifest = getClass().getClassLoader().getResource("Common/manifest.json") != null;
         getLogger().atInfo().log("NinjaTags loaded. UI resources: Common/UI/Custom/TagsMenu.ui=%s, TagsMenu.ui=%s", hasUiDoc, hasUiDocAlt);
+        getLogger().atInfo().log("NinjaTags asset-pack manifest present: Common/manifest.json=%s", hasAssetManifest);
         getLogger().atInfo().log("NinjaTags known CustomUI docs: [Common/UI/Custom/TagsMenu.ui]");
     }
 

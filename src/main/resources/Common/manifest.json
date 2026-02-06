@@ -1,0 +1,12 @@
+{
+  "Group": "ninja",
+  "Name": "ninjatags",
+  "Version": "1.0.0",
+  "Description": "NinjaTags asset pack",
+  "Authors": [
+    {
+      "Name": "Ninja"
+    }
+  ],
+  "Website": "https://example.com"
+}
