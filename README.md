@@ -8,10 +8,25 @@ NinjaTags is a Hytale plugin that provides player tags with LuckPerms suffix int
 - Tag equip/de-equip is handled directly by UI button clicks (no chat subcommands required).
 - `/tagsadmin givetag <player> <tagid>` gives a tag to a player.
 - `/tagsadmin removetag <player> <tagid>` removes a tag from a player.
-- `/tagsadmin reload` reloads `tags.json` at runtime without restarting the server.
+- `/tagsadmin reload` reloads `tags.json` and `config.yml` at runtime without restarting the server.
 - Player tag ownership is saved to JSON (`player-tags.json`) in the plugin data folder.
 - Tag definitions are saved in `tags.json` (generated with defaults on first startup).
 - Equipping a tag applies a LuckPerms suffix using the format `&` + `#RRGGBB` + tag text (example result: `&#808080Ninja`).
+
+
+## Configuration
+
+NinjaTags writes and reads `config.yml` from the plugin data folder (for example `plugins/NinjaTags/config.yml`).
+
+### `config.yml`
+
+```yml
+ui:
+  title: "Ninja Tags"
+```
+
+- `ui.title` controls the title text at the top of the `/tags` menu UI.
+- You can change `ui.title` and run `/tagsadmin reload` to apply the new title for newly opened menus.
 
 ## Data files
 
