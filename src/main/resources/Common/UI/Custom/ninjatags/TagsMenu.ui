@@ -11,7 +11,7 @@ $C.@PageOverlay {
       Background: #10151c(0.96);
       Padding: (Left: 20, Top: 16, Right: 20, Bottom: 16);
 
-      Label #Title {
+      Label #TitleLabel {
         Anchor: (Height: 40);
         Text: "Ninja Tags";
         Style: (FontSize: 28, TextColor: #ffffff, RenderBold: true, HorizontalAlignment: Center);

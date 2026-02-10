@@ -37,6 +37,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
 
     private TagRepository tagRepository;
     private LuckPermsTagService luckPermsTagService;
+    private NinjaTagsConfig config;
 
     public NinjaTagsPlugin(JavaPluginInit init) {
         super(init);
@@ -46,6 +47,8 @@ public class NinjaTagsPlugin extends JavaPlugin {
     protected void setup() {
         this.tagRepository = new TagRepository(getDataDirectory(), getLogger());
         this.tagRepository.load();
+        this.config = new NinjaTagsConfig(getDataDirectory(), getLogger());
+        this.config.load();
         this.luckPermsTagService = new LuckPermsTagService(getLogger());
 
         getCommandRegistry().registerCommand(new TagsCommand());
@@ -119,11 +122,16 @@ public class NinjaTagsPlugin extends JavaPlugin {
             String sub = args.get(1).toLowerCase(Locale.ROOT);
             if (sub.equals("reload")) {
                 int count = tagRepository.reloadTags();
-                if (count >= 0) {
-                    ctx.sendMessage(Message.raw("Reloaded tags.json (" + count + " tags loaded)."));
-                } else {
-                    ctx.sendMessage(Message.raw("Failed to reload tags.json. Check server logs for details."));
-                }
+                boolean configReloaded = config.reload();
+
+                String tagsResult = count >= 0
+                        ? "Reloaded tags.json (" + count + " tags loaded)."
+                        : "Failed to reload tags.json. Check server logs for details.";
+                String configResult = configReloaded
+                        ? "Reloaded config.yml (ui.title='" + config.getUiTitle() + "')."
+                        : "Failed to reload config.yml. Check server logs for details.";
+
+                ctx.sendMessage(Message.raw(tagsResult + " " + configResult));
                 return CompletableFuture.completedFuture(null);
             }
 
@@ -251,7 +259,7 @@ public class NinjaTagsPlugin extends JavaPlugin {
             getLogger().atInfo().log("Building TagsMenuPage for %s (%s). ownedTags=%s equipped=%s", playerRef.getUsername(), playerId, ownedTags.size(), equippedId);
             getLogger().atInfo().log("Appending CustomUI document: ninjatags/TagsMenu.ui");
             uiCommandBuilder.append("ninjatags/TagsMenu.ui");
-            uiCommandBuilder.set("#Title.TextSpans", Message.raw("Ninja Tags"));
+            uiCommandBuilder.set("#TitleLabel.TextSpans", Message.raw(config.getUiTitle()));
 
             for (int i = 0; i < MAX_VISIBLE_TAG_ROWS; i++) {
                 String labelPath = "#TagLabel" + i;
